@@ -1,0 +1,2 @@
+pnpm exec biome check --write --unsafe --staged --no-errors-on-unmatched
+git update-index --again
