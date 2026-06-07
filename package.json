@@ -1,0 +1,35 @@
+{
+  "name": "retry-fn",
+  "version": "0.0.0",
+  "description": "Retry an async function with exponential backoff",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "check:pkg": "publint && attw --pack"
+  },
+  "keywords": [
+    "retry",
+    "backoff",
+    "async"
+  ],
+  "license": "MIT",
+  "packageManager": "pnpm@10.18.0",
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.3",
+    "publint": "^0.3.21",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
