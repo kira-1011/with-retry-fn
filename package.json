@@ -5,18 +5,18 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
-    "check:pkg": "publint && attw --pack"
+    "check:pkg": "publint && attw --pack --profile esm-only"
   },
   "keywords": [
     "retry",
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
     "publint": "^0.3.21",
-    "tsup": "^8.5.1",
+    "tsdown": "^0.22.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   }
