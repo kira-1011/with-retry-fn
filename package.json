@@ -26,9 +26,20 @@
   "keywords": [
     "retry",
     "backoff",
-    "async"
+    "async",
+    "promise",
+    "esm"
   ],
+  "author": "Kirubel (https://github.com/kira-1011)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kira-1011/retry-fn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kira-1011/retry-fn/issues"
+  },
+  "homepage": "https://github.com/kira-1011/retry-fn#readme",
   "packageManager": "pnpm@10.18.0",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
