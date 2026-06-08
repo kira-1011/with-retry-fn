@@ -10,7 +10,7 @@
 
 # retry-fn
 
-**Retry an async function that fails transiently — with a clean, fully-typed API.**
+**Retry an async function that fails transiently, with a clean, fully-typed API.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat&colorA=000000&colorB=000000)](./LICENSE)
 ![Module: ESM only](https://img.shields.io/badge/module-ESM%20only-blue?style=flat&colorA=000000&colorB=000000)
@@ -37,7 +37,7 @@
 ---
 
 `retry-fn` wraps an async operation so that **transient failures are retried
-automatically** instead of bubbling up on the first error — the kinds of
+automatically** instead of bubbling up on the first error. Those are the
 failures (a brief `503`, a dropped connection, a momentary timeout) that
 succeed if you simply try again a moment later. Exponential backoff, a delay
 cap, and a "should I even retry this?" predicate are all built in, behind a
@@ -47,7 +47,7 @@ single tiny function.
 
 Network and I/O calls fail _transiently_: the operation is still valid, the
 timing was just unlucky. Without retries, one momentary hiccup fails the whole
-operation. And hand-rolled retry loops tend to get the details wrong — no
+operation. And hand-rolled retry loops tend to get the details wrong: no
 backoff, retrying errors that will never succeed (like an HTTP `400`), or
 swallowing the original error so you can't tell what actually went wrong.
 `retry-fn` aims to get those details right behind a tiny API.
@@ -58,13 +58,13 @@ swallowing the original error so you can't tell what actually went wrong.
 - ⚡ Returns the result as soon as an attempt succeeds
 - 📈 Exponential backoff with a configurable growth factor and maximum delay
 - 🎯 `shouldRetry` predicate to skip errors that can't succeed (e.g. HTTP `400`)
-- 🧩 Rethrows the **original** error when all attempts fail — no error swallowing
+- 🧩 Rethrows the **original** error when all attempts fail, with no error swallowing
 - 🔠 Fully typed: the return type is inferred from your function
 - 📦 ESM-only, zero runtime dependencies
 
 ## Install
 
-> **Not yet published to npm.** It's coming — for now you can try it by cloning
+> **Not yet published to npm.** It's coming. For now you can try it by cloning
 > the repo (see [Development](#development)). Once released:
 
 ```sh
@@ -72,7 +72,7 @@ pnpm add retry-fn
 # npm install retry-fn  •  yarn add retry-fn
 ```
 
-Requires a modern ESM environment (Node.js ≥ 18, or any bundler).
+Requires a modern ESM environment (Node.js 18+, or any bundler).
 
 ## Usage
 
@@ -87,11 +87,11 @@ exponentially growing delay, up to the configured number of retries. It
 returns as soon as an attempt succeeds; if every attempt fails, the
 **original** error is thrown.
 
-The return type flows through automatically — no annotations needed:
+The return type flows through automatically, with no annotations needed:
 
 ```ts
 const user = await withRetry(() => getUser("123"));
-//    ^? User — inferred from the function's return type
+//    ^? User (inferred from the function's return type)
 ```
 
 ### With options
@@ -132,16 +132,7 @@ if `shouldRetry` rejects the error).
 | `shouldRetry` | `(error: unknown) => boolean` | `() => true` | Decides whether a given error is worth retrying.                             |
 
 **Backoff:** the wait before retry _n_ (0-indexed) is `min(delay × factorⁿ, maxDelay)`.
-With the defaults that's 200 ms, 400 ms, then 500 ms (capped), …
-
-## Roadmap
-
-- [x] Configurable `retries` and `delay` via an options object
-- [x] Exponential backoff with a configurable `factor` and `maxDelay` cap
-- [x] `shouldRetry(error)` predicate to skip non-retryable errors (e.g. HTTP `400`)
-- [ ] Jitter, to avoid the thundering-herd problem
-- [ ] `AbortSignal` support for cancellation
-- [ ] First publish to npm
+With the defaults that's 200 ms, 400 ms, then 500 ms (capped), and so on.
 
 ## Development
 
@@ -162,7 +153,7 @@ and verified with [publint](https://publint.dev) and
 
 ## Contributing
 
-Contributions are welcome — `retry-fn` is open source (MIT) and built in the
+Contributions are welcome. `retry-fn` is open source (MIT) and built in the
 open. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for setup, the development
 workflow, and the PR checklist, and please follow our
 **[Code of Conduct](./CODE_OF_CONDUCT.md)**.
@@ -173,7 +164,7 @@ quick issue to discuss the approach before a PR is appreciated.
 
 ## Security
 
-Found a vulnerability? Please report it responsibly — see our
+Found a vulnerability? Please report it responsibly via our
 **[Security Policy](./SECURITY.md)**. Don't open public issues for security
 problems.
 
