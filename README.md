@@ -28,8 +28,10 @@ swallowing the original error so you can't tell what actually went wrong.
 
 - ♻️ Retries a failing async function automatically
 - ⚡ Returns the result as soon as an attempt succeeds
-- 🎯 Rethrows the **original** error when all attempts fail — no error swallowing
-- 🧩 Fully typed: the return type is inferred from your function
+- 📈 Exponential backoff with a configurable maximum delay
+- 🎯 `shouldRetry` predicate to skip errors that can't succeed (e.g. HTTP `400`)
+- 🧩 Rethrows the **original** error when all attempts fail — no error swallowing
+- 🔠 Fully typed: the return type is inferred from your function
 - 📦 ESM-only, zero runtime dependencies
 
 ## Install
@@ -51,9 +53,10 @@ import { withRetry } from "retry-fn";
 const data = await withRetry(() => fetchFromFlakyApi());
 ```
 
-If `fetchFromFlakyApi()` rejects, `withRetry` waits briefly and tries once
-more. If it succeeds on either attempt, you get the value back. If every
-attempt fails, the **original** error is thrown.
+If `fetchFromFlakyApi()` rejects, `withRetry` waits and tries again with an
+exponentially growing delay, up to the configured number of retries. It
+returns as soon as an attempt succeeds; if every attempt fails, the
+**original** error is thrown.
 
 The return type flows through automatically — no annotations needed:
 
@@ -62,32 +65,51 @@ const user = await withRetry(() => getUser("123"));
 //    ^? User — inferred from the function's return type
 ```
 
+### With options
+
+```ts
+const data = await withRetry(() => callApi(), {
+  retries: 5, // up to 5 retries (6 attempts total)
+  delay: 200, // base delay in ms; doubles each attempt
+  maxDelay: 5000, // never wait longer than 5s between attempts
+  shouldRetry: (
+    error, // only retry transient failures
+  ) => error instanceof ApiError && error.status >= 500,
+});
+```
+
 ## API
 
-### `withRetry<T>(fn): Promise<T>`
-
-| Param | Type               | Description                       |
-| ----- | ------------------ | --------------------------------- |
-| `fn`  | `() => Promise<T>` | The async operation to attempt.   |
+### `withRetry<T>(fn, options?): Promise<T>`
 
 Returns a `Promise<T>` that resolves with `fn`'s result on the first success,
-or rejects with the original error if all attempts fail.
+or rejects with the original error once retries are exhausted (or immediately,
+if `shouldRetry` rejects the error).
 
-**Current behavior (v0):**
+| Param     | Type               | Description                     |
+| --------- | ------------------ | ------------------------------- |
+| `fn`      | `() => Promise<T>` | The async operation to attempt. |
+| `options` | `RetryOptions`     | Optional. See below.            |
 
-- Up to **2 attempts** total (1 initial call + 1 retry).
-- A fixed **200 ms** delay between attempts.
-- The **original error** from the final attempt is rethrown.
+#### `RetryOptions`
 
-> Retry count and delay are not configurable yet — that's the next milestone
-> on the [Roadmap](#roadmap).
+| Option        | Type                          | Default      | Description                                                                |
+| ------------- | ----------------------------- | ------------ | -------------------------------------------------------------------------- |
+| `retries`     | `number`                      | `3`          | Retries after the initial attempt (so `3` means up to 4 attempts total).   |
+| `delay`       | `number`                      | `200`        | Base delay in ms before the first retry; doubles on each subsequent retry. |
+| `maxDelay`    | `number`                      | `500`        | Upper bound in ms on the backoff delay.                                    |
+| `shouldRetry` | `(error: unknown) => boolean` | `() => true` | Decides whether a given error is worth retrying.                           |
+
+**Backoff:** the wait before retry _n_ (0-indexed) is `min(delay × 2ⁿ, maxDelay)`.
+With the defaults that's 200 ms, 400 ms, then 500 ms (capped), …
 
 ## Roadmap
 
-- [ ] Configurable `retries` and `delay` via an options object
-- [ ] Exponential backoff (`minDelay`, `maxDelay`, growth factor)
+- [x] Configurable `retries` and `delay` via an options object
+- [x] Exponential backoff with a `maxDelay` cap
+- [x] `shouldRetry(error)` predicate to skip non-retryable errors (e.g. HTTP `400`)
+- [ ] Configurable growth factor (currently fixed at ×2)
 - [ ] Jitter, to avoid the thundering-herd problem
-- [ ] `shouldRetry(error)` predicate to skip non-retryable errors (e.g. HTTP `400`)
 - [ ] `AbortSignal` support for cancellation
 - [ ] First publish to npm
 
