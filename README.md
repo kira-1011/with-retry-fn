@@ -70,7 +70,8 @@ const user = await withRetry(() => getUser("123"));
 ```ts
 const data = await withRetry(() => callApi(), {
   retries: 5, // up to 5 retries (6 attempts total)
-  delay: 200, // base delay in ms; doubles each attempt
+  delay: 200, // base delay in ms
+  factor: 2, // delay multiplier per attempt (exponential backoff)
   maxDelay: 5000, // never wait longer than 5s between attempts
   shouldRetry: (
     error, // only retry transient failures
@@ -95,12 +96,13 @@ if `shouldRetry` rejects the error).
 
 | Option        | Type                          | Default      | Description                                                                |
 | ------------- | ----------------------------- | ------------ | -------------------------------------------------------------------------- |
-| `retries`     | `number`                      | `3`          | Retries after the initial attempt (so `3` means up to 4 attempts total).   |
-| `delay`       | `number`                      | `200`        | Base delay in ms before the first retry; doubles on each subsequent retry. |
-| `maxDelay`    | `number`                      | `500`        | Upper bound in ms on the backoff delay.                                    |
-| `shouldRetry` | `(error: unknown) => boolean` | `() => true` | Decides whether a given error is worth retrying.                           |
+| `retries`     | `number`                      | `3`          | Retries after the initial attempt (so `3` means up to 4 attempts total).     |
+| `delay`       | `number`                      | `200`        | Base delay in ms before the first retry.                                     |
+| `factor`      | `number`                      | `2`          | Multiplier applied to the delay on each subsequent retry (the backoff base). |
+| `maxDelay`    | `number`                      | `500`        | Upper bound in ms on the backoff delay.                                      |
+| `shouldRetry` | `(error: unknown) => boolean` | `() => true` | Decides whether a given error is worth retrying.                             |
 
-**Backoff:** the wait before retry _n_ (0-indexed) is `min(delay × 2ⁿ, maxDelay)`.
+**Backoff:** the wait before retry _n_ (0-indexed) is `min(delay × factorⁿ, maxDelay)`.
 With the defaults that's 200 ms, 400 ms, then 500 ms (capped), …
 
 ## Roadmap
@@ -108,7 +110,7 @@ With the defaults that's 200 ms, 400 ms, then 500 ms (capped), …
 - [x] Configurable `retries` and `delay` via an options object
 - [x] Exponential backoff with a `maxDelay` cap
 - [x] `shouldRetry(error)` predicate to skip non-retryable errors (e.g. HTTP `400`)
-- [ ] Configurable growth factor (currently fixed at ×2)
+- [x] Configurable backoff `factor`
 - [ ] Jitter, to avoid the thundering-herd problem
 - [ ] `AbortSignal` support for cancellation
 - [ ] First publish to npm

@@ -2,6 +2,7 @@ interface RetryOptions {
   retries?: number;
   delay?: number; // ms
   maxDelay?: number; // max delay cap
+  factor?: number;
   shouldRetry?: (error: unknown) => boolean;
 }
 
@@ -13,6 +14,7 @@ export async function withRetry<T>(
     retries = 3,
     delay = 200,
     maxDelay = 500,
+    factor = 2,
     shouldRetry = () => true,
   } = retryOptions;
 
@@ -20,7 +22,7 @@ export async function withRetry<T>(
     new Promise((resolve) => setTimeout(resolve, ms));
 
   for (let attempts = 0; attempts <= retries; attempts += 1) {
-    const currentDelay = Math.min(delay * 2 ** attempts, maxDelay);
+    const currentDelay = Math.min(delay * factor ** attempts, maxDelay);
     try {
       return await fn();
     } catch (error) {

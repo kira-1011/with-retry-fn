@@ -90,18 +90,17 @@ describe("withRetry", () => {
     expect(fn).toHaveBeenCalledTimes(2); // retried the first, stopped at the second
   });
 
-  it("retries only the errors shouldRetry accepts", async () => {
-    const fn = vi
-      .fn()
-      .mockRejectedValueOnce(new Error("retryable"))
-      .mockRejectedValueOnce(new Error("fatal"))
-      .mockResolvedValue("ok");
-    const shouldRetry = (err: unknown) =>
-      (err as Error).message === "retryable";
+  it("scales the backoff by a custom factor", async () => {
+    vi.useFakeTimers();
+    const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+    const fn = vi.fn().mockRejectedValue(new Error("boom"));
 
-    await expect(withRetry(fn, { retries: 5, shouldRetry })).rejects.toThrow(
-      "fatal",
-    );
-    expect(fn).toHaveBeenCalledTimes(2); // retried the first, stopped at the second
+    const promise = withRetry(fn, { retries: 2, delay: 100, factor: 3 });
+    promise.catch(() => {});
+    await vi.runAllTimersAsync();
+
+    const delays = setTimeoutSpy.mock.calls.map((c) => c[1]);
+    expect(delays).toEqual([100, 300]); // 100, then 100×3 (still under the 500 cap)
+    vi.useRealTimers();
   });
 });
