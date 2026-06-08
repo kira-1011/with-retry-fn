@@ -15,8 +15,13 @@
   "scripts": {
     "build": "tsdown",
     "test": "vitest",
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "format": "biome format --write",
+    "lint": "biome lint",
     "typecheck": "tsc --noEmit",
-    "check:pkg": "publint && attw --pack --profile esm-only"
+    "check:pkg": "publint && attw --pack --profile esm-only",
+    "prepare": "husky"
   },
   "keywords": [
     "retry",
@@ -27,6 +32,8 @@
   "packageManager": "pnpm@10.18.0",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
+    "@biomejs/biome": "2.4.16",
+    "husky": "^9.1.7",
     "publint": "^0.3.21",
     "tsdown": "^0.22.2",
     "typescript": "^6.0.3",
