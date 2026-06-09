@@ -1,6 +1,6 @@
 {
   "name": "with-retry-fn",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Retry an async function with exponential backoff",
   "type": "module",
   "exports": {
