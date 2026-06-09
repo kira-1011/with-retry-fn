@@ -7,7 +7,7 @@ welcome.
 ## Getting started
 
 ```sh
-git clone https://github.com/kira-1011/retry-fn.git
+git clone https://github.com/kira-1011/with-retry-fn.git
 cd retry-fn
 pnpm install
 ```
@@ -44,7 +44,7 @@ automatically.
 
 ## Reporting bugs & proposing features
 
-- **Bugs:** open an [issue](https://github.com/kira-1011/retry-fn/issues) with a
+- **Bugs:** open an [issue](https://github.com/kira-1011/with-retry-fn/issues) with a
   minimal reproduction.
 - **Features:** for anything non-trivial, please open an issue to discuss the
   approach before investing in a PR.

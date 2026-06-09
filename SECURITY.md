@@ -16,7 +16,7 @@ Please **do not** report security vulnerabilities through public GitHub issues.
 
 Instead, use GitHub's private vulnerability reporting:
 
-1. Go to the [Security tab](https://github.com/kira-1011/retry-fn/security) of
+1. Go to the [Security tab](https://github.com/kira-1011/with-retry-fn/security) of
    the repository.
 2. Click **"Report a vulnerability"**.
 

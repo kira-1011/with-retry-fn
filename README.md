@@ -4,11 +4,11 @@
 <picture>
   <source srcset="./assets/banner-dark.png" media="(prefers-color-scheme: dark)" />
   <source srcset="./assets/banner-light.png" media="(prefers-color-scheme: light)" />
-  <img src="./assets/banner-light.png" alt="retry-fn" width="600" />
+  <img src="./assets/banner-light.png" alt="with-retry-fn" width="600" />
 </picture>
 -->
 
-# retry-fn
+# with-retry-fn
 
 **Retry an async function that fails transiently, with a clean, fully-typed API.**
 
@@ -18,14 +18,14 @@
 ![PRs welcome](https://img.shields.io/badge/PRs-welcome-blue?style=flat&colorA=000000&colorB=000000)
 
 <!-- Uncomment once published to npm:
-[![npm version](https://img.shields.io/npm/v/retry-fn.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/retry-fn)
-[![npm downloads](https://img.shields.io/npm/dm/retry-fn?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/retry-fn)
+[![npm version](https://img.shields.io/npm/v/with-retry-fn.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/with-retry-fn)
+[![npm downloads](https://img.shields.io/npm/dm/with-retry-fn?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/with-retry-fn)
 -->
 
 <p>
-  <a href="https://github.com/kira-1011/retry-fn">GitHub</a>
+  <a href="https://github.com/kira-1011/with-retry-fn">GitHub</a>
   ·
-  <a href="https://github.com/kira-1011/retry-fn/issues">Issues</a>
+  <a href="https://github.com/kira-1011/with-retry-fn/issues">Issues</a>
   ·
   <a href="#api">API</a>
   ·
@@ -36,7 +36,7 @@
 
 ---
 
-`retry-fn` wraps an async operation so that **transient failures are retried
+`with-retry-fn` wraps an async operation so that **transient failures are retried
 automatically** instead of bubbling up on the first error. Those are the
 failures (a brief `503`, a dropped connection, a momentary timeout) that
 succeed if you simply try again a moment later. Exponential backoff, a delay
@@ -50,7 +50,7 @@ timing was just unlucky. Without retries, one momentary hiccup fails the whole
 operation. And hand-rolled retry loops tend to get the details wrong: no
 backoff, retrying errors that will never succeed (like an HTTP `400`), or
 swallowing the original error so you can't tell what actually went wrong.
-`retry-fn` aims to get those details right behind a tiny API.
+`with-retry-fn` aims to get those details right behind a tiny API.
 
 ## Features
 
@@ -70,8 +70,8 @@ swallowing the original error so you can't tell what actually went wrong.
 > the repo (see [Development](#development)). Once released:
 
 ```sh
-pnpm add retry-fn
-# npm install retry-fn  •  yarn add retry-fn
+pnpm add with-retry-fn
+# npm install with-retry-fn  •  yarn add with-retry-fn
 ```
 
 Requires a modern ESM environment (Node.js 18+, or any bundler).
@@ -79,7 +79,7 @@ Requires a modern ESM environment (Node.js 18+, or any bundler).
 ## Usage
 
 ```ts
-import { withRetry } from "retry-fn";
+import { withRetry } from "with-retry-fn";
 
 const data = await withRetry(() => fetchFromFlakyApi());
 ```
@@ -172,13 +172,13 @@ and verified with [publint](https://publint.dev) and
 
 ## Contributing
 
-Contributions are welcome. `retry-fn` is open source (MIT) and built in the
+Contributions are welcome. `with-retry-fn` is open source (MIT) and built in the
 open. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for setup, the development
 workflow, and the PR checklist, and please follow our
 **[Code of Conduct](./CODE_OF_CONDUCT.md)**.
 
 **Found a bug or have an idea?** Open an
-[issue](https://github.com/kira-1011/retry-fn/issues). For larger features, a
+[issue](https://github.com/kira-1011/with-retry-fn/issues). For larger features, a
 quick issue to discuss the approach before a PR is appreciated.
 
 ## Security

@@ -1,6 +1,6 @@
 {
-  "name": "retry-fn",
-  "version": "0.0.0",
+  "name": "with-retry-fn",
+  "version": "0.1.0",
   "description": "Retry an async function with exponential backoff",
   "type": "module",
   "exports": {
@@ -21,6 +21,7 @@
     "lint": "biome lint",
     "typecheck": "tsc --noEmit",
     "check:pkg": "publint && attw --pack --profile esm-only",
+    "prepublishOnly": "pnpm build",
     "prepare": "husky"
   },
   "keywords": [
@@ -34,12 +35,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kira-1011/retry-fn.git"
+    "url": "git+https://github.com/kira-1011/with-retry-fn.git"
   },
   "bugs": {
-    "url": "https://github.com/kira-1011/retry-fn/issues"
+    "url": "https://github.com/kira-1011/with-retry-fn/issues"
   },
-  "homepage": "https://github.com/kira-1011/retry-fn#readme",
+  "homepage": "https://github.com/kira-1011/with-retry-fn#readme",
   "packageManager": "pnpm@10.18.0",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.3",
