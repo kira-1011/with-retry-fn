@@ -103,4 +103,49 @@ describe("withRetry", () => {
     expect(delays).toEqual([100, 300]); // 100, then 100×3 (still under the 500 cap)
     vi.useRealTimers();
   });
+
+  it("rejects without calling fn if the signal is already aborted", async () => {
+    const fn = vi.fn().mockResolvedValue("ok");
+    const signal = AbortSignal.abort(); // a signal that starts out aborted
+    await expect(withRetry(fn, { signal })).rejects.toThrow();
+    expect(fn).toHaveBeenCalledTimes(0); // never even tried
+  });
+
+  it("interrupts the backoff wait immediately when aborted mid-sleep", async () => {
+    vi.useFakeTimers();
+    const controller = new AbortController();
+    const fn = vi.fn().mockRejectedValue(new Error("boom"));
+
+    const promise = withRetry(fn, {
+      retries: 5,
+      delay: 1000,
+      signal: controller.signal,
+    });
+    promise.catch(() => {});
+
+    await vi.advanceTimersByTimeAsync(0); // let attempt 0 fail and enter the 1000ms sleep
+    expect(fn).toHaveBeenCalledTimes(1);
+
+    controller.abort(); // abort partway through the wait
+    await vi.advanceTimersByTimeAsync(0); // flush microtasks (NOT the full 1000ms)
+
+    await expect(promise).rejects.toThrow();
+    expect(fn).toHaveBeenCalledTimes(1); // never retried, and didn't wait out the timer
+  });
+
+  it("stops on abort without consulting shouldRetry", async () => {
+    const controller = new AbortController();
+    const shouldRetry = vi.fn(() => true);
+    const fn = vi.fn().mockImplementation(async () => {
+      controller.abort(); // the underlying op got cancelled
+      throw new Error("op failed"); // and surfaced its own error
+    });
+
+    await expect(
+      withRetry(fn, { retries: 5, signal: controller.signal, shouldRetry }),
+    ).rejects.toThrow();
+
+    expect(fn).toHaveBeenCalledTimes(1); // no retry
+    expect(shouldRetry).not.toHaveBeenCalled(); // abort short-circuited before shouldRetry
+  });
 });
