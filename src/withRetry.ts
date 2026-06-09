@@ -33,6 +33,28 @@ const sleep = (ms: number, signal?: AbortSignal) =>
   });
 
 /**
+ * Validates the numeric retry options.
+ * @throws {RangeError} if any value is out of range.
+ */
+function validateOptions({
+  delay,
+  factor,
+  maxDelay,
+  retries,
+}: Omit<RetryOptions, "signal" | "jitter" | "shouldRetry">): void {
+  if (retries !== undefined && (!Number.isInteger(retries) || retries < 0)) {
+    throw new RangeError("withRetry: `retries` must be a non-negative integer");
+  }
+  for (const [name, value] of Object.entries({ delay, maxDelay, factor })) {
+    if (value !== undefined && (Number.isNaN(value) || value < 0)) {
+      throw new RangeError(
+        `withRetry: \`${name}\` must be a non-negative number`,
+      );
+    }
+  }
+}
+
+/**
  * Runs `fn`, retrying with exponential backoff if it rejects.
  *
  * Resolves with the first successful result. Rejects with the original error
@@ -43,6 +65,7 @@ export async function withRetry<T>(
   fn: () => Promise<T>,
   options: RetryOptions = {},
 ): Promise<T> {
+  validateOptions(options);
   const {
     retries = 3,
     delay = 200,

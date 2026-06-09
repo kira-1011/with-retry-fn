@@ -164,4 +164,23 @@ describe("withRetry", () => {
     vi.useRealTimers();
     vi.restoreAllMocks();
   });
+
+  it("throws RangeError on negative retries, without calling fn", async () => {
+    const fn = vi.fn();
+    await expect(withRetry(fn, { retries: -1 })).rejects.toThrow(RangeError);
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it("throws RangeError on a negative delay/maxDelay/factor", async () => {
+    const fn = vi.fn();
+    await expect(withRetry(fn, { delay: -1 })).rejects.toThrow(RangeError);
+    await expect(withRetry(fn, { factor: -2 })).rejects.toThrow(RangeError);
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it("throws RangeError on a NaN option", async () => {
+    const fn = vi.fn();
+    await expect(withRetry(fn, { delay: NaN })).rejects.toThrow(RangeError);
+    expect(fn).not.toHaveBeenCalled();
+  });
 });
