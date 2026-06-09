@@ -57,6 +57,8 @@ swallowing the original error so you can't tell what actually went wrong.
 - ♻️ Retries a failing async function automatically
 - ⚡ Returns the result as soon as an attempt succeeds
 - 📈 Exponential backoff with a configurable growth factor and maximum delay
+- 🎲 Optional jitter to spread out retries and avoid the thundering-herd problem
+- 🛑 Cancel in-flight retries (and the current wait) with an `AbortSignal`
 - 🎯 `shouldRetry` predicate to skip errors that can't succeed (e.g. HTTP `400`)
 - 🧩 Rethrows the **original** error when all attempts fail, with no error swallowing
 - 🔠 Fully typed: the return type is inferred from your function
@@ -102,10 +104,22 @@ const data = await withRetry(() => callApi(), {
   delay: 200, // base delay in ms
   factor: 2, // delay multiplier per attempt (exponential backoff)
   maxDelay: 5000, // never wait longer than 5s between attempts
+  jitter: true, // randomize the wait to avoid synchronized retries
   shouldRetry: (
     error, // only retry transient failures
   ) => error instanceof ApiError && error.status >= 500,
 });
+```
+
+### Cancellation
+
+Pass an `AbortSignal` to cancel the retry sequence (including the current
+backoff wait) the instant it fires. Use `AbortSignal.timeout()` for a total
+time budget, or an `AbortController` for manual cancellation:
+
+```ts
+const signal = AbortSignal.timeout(5000); // give up after 5s across all attempts
+await withRetry(() => fetch("/api", { signal }), { signal });
 ```
 
 ## API
@@ -129,10 +143,15 @@ if `shouldRetry` rejects the error).
 | `delay`       | `number`                      | `200`        | Base delay in ms before the first retry.                                     |
 | `factor`      | `number`                      | `2`          | Multiplier applied to the delay on each subsequent retry (the backoff base). |
 | `maxDelay`    | `number`                      | `500`        | Upper bound in ms on the backoff delay.                                      |
+| `jitter`      | `boolean`                     | `false`      | Randomize the delay (full jitter) to avoid synchronized retries.             |
+| `signal`      | `AbortSignal`                 | `(none)`     | Cancels the retry sequence and the current wait when aborted.                |
 | `shouldRetry` | `(error: unknown) => boolean` | `() => true` | Decides whether a given error is worth retrying.                             |
 
 **Backoff:** the wait before retry _n_ (0-indexed) is `min(delay × factorⁿ, maxDelay)`.
 With the defaults that's 200 ms, 400 ms, then 500 ms (capped), and so on.
+
+**Jitter:** with `jitter: true`, each wait is randomized to `random(0, that value)`,
+spreading retries across callers to avoid the thundering-herd problem.
 
 ## Development
 

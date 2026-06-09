@@ -11,6 +11,7 @@ interface RetryOptions {
   /** When fired, aborts the retry sequence and the current backoff wait. */
   signal?: AbortSignal;
   /** Return `false` to stop retrying a given error. Default: retry everything. */
+  jitter?: boolean;
   shouldRetry?: (error: unknown) => boolean;
 }
 
@@ -48,6 +49,7 @@ export async function withRetry<T>(
     maxDelay = 500,
     factor = 2,
     signal,
+    jitter = false,
     shouldRetry = () => true,
   } = options;
 
@@ -59,7 +61,8 @@ export async function withRetry<T>(
       if (signal?.aborted) throw signal.reason; // cancellation wins over shouldRetry
       if (attempt === retries || !shouldRetry(error)) throw error;
 
-      const backoff = Math.min(delay * factor ** attempt, maxDelay);
+      const capped = Math.min(delay * factor ** attempt, maxDelay);
+      const backoff = jitter ? Math.random() * capped : capped;
       await sleep(backoff, signal);
     }
   }

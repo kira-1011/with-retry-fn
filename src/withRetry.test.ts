@@ -148,4 +148,20 @@ describe("withRetry", () => {
     expect(fn).toHaveBeenCalledTimes(1); // no retry
     expect(shouldRetry).not.toHaveBeenCalled(); // abort short-circuited before shouldRetry
   });
+
+  it("applies full jitter to the delay when enabled", async () => {
+    vi.useFakeTimers();
+    vi.spyOn(Math, "random").mockReturnValue(0.5); // deterministic jitter
+    const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+    const fn = vi.fn().mockRejectedValue(new Error("boom"));
+
+    const promise = withRetry(fn, { retries: 1, delay: 100, jitter: true });
+    promise.catch(() => {});
+    await vi.runAllTimersAsync();
+
+    const delays = setTimeoutSpy.mock.calls.map((c) => c[1]);
+    expect(delays).toEqual([50]); // 0.5 × min(100×2^0, 500) = 0.5 × 100
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
 });
