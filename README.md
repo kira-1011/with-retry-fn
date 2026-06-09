@@ -17,10 +17,8 @@
 ![Types: included](https://img.shields.io/badge/types-included-blue?style=flat&colorA=000000&colorB=000000)
 ![PRs welcome](https://img.shields.io/badge/PRs-welcome-blue?style=flat&colorA=000000&colorB=000000)
 
-<!-- Uncomment once published to npm:
 [![npm version](https://img.shields.io/npm/v/with-retry-fn.svg?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/with-retry-fn)
 [![npm downloads](https://img.shields.io/npm/dm/with-retry-fn?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/with-retry-fn)
--->
 
 <p>
   <a href="https://github.com/kira-1011/with-retry-fn">GitHub</a>
@@ -65,9 +63,6 @@ swallowing the original error so you can't tell what actually went wrong.
 - 📦 ESM-only, zero runtime dependencies
 
 ## Install
-
-> **Not yet published to npm.** It's coming. For now you can try it by cloning
-> the repo (see [Development](#development)). Once released:
 
 ```sh
 pnpm add with-retry-fn
